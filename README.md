@@ -6,6 +6,20 @@ Integration for New Relic Infrastructure written in Go
 
 [Rabbit-Hole](https://github.com/michaelklishin/rabbit-hole)
 
+
+# Testing
+
+Docker
+`docker run -d --hostname my-rabbit --name some-rabbit -p 15672:15672 rabbitmq:3-management`
+
+Install New Relic Infrastructure Agent
+
+Build .go file
+
+Copy rabbitmq_integration binary to /var/db/newrelic-infra/custom-integrations/bin/
+Copy rabbitmq_integration-definition.yml to /var/db/newrelic-infra/custom-integrations/
+Copy rabbitmq_integration-config.yml to /etc/newrelic-infra/integrations.d
+
 # Usage
 
 `./rabbitmq_integration -pretty`
