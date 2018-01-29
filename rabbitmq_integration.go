@@ -85,14 +85,17 @@ func populateMetrics(ms *metric.MetricSet) {
         rmqc := rmqClient()
         res, err := rmqc.Overview()
         fatalIfErr(err)
+        // Object Totals
         ms.SetMetric("Exchanges", res.ObjectTotals.Exchanges, metric.GAUGE)
         ms.SetMetric("Queues", res.ObjectTotals.Queues, metric.GAUGE)
         ms.SetMetric("Connections", res.ObjectTotals.Connections, metric.GAUGE)
         ms.SetMetric("Channels", res.ObjectTotals.Channels, metric.GAUGE)
         ms.SetMetric("Consumers", res.ObjectTotals.Consumers, metric.GAUGE)
+        //Queue Totals
         ms.SetMetric("Messages", res.QueueTotals.Messages, metric.GAUGE)
         ms.SetMetric("Messages Unacknowledged", res.QueueTotals.MessagesUnacknowledged, metric.GAUGE)
         ms.SetMetric("Messages Ready", res.QueueTotals.MessagesReady, metric.GAUGE)
+        //Message Stats
         ms.SetMetric("Message Stats | Publish", res.MessageStats.Publish, metric.GAUGE)
 
 }
