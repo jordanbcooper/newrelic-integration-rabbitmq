@@ -8,6 +8,7 @@ This integration will be used with a Bosh Release, but I have been testing it ou
 
 [New Relic Infrastructure Agent](https://docs.newrelic.com/docs/infrastructure/new-relic-infrastructure/installation/install-infrastructure-linux)
 
+[New Relic Infrastructure Agent SDK](https://github.com/newrelic/infra-integrations-sdk)
 [Rabbit-Hole](https://github.com/michaelklishin/rabbit-hole)
 
 
