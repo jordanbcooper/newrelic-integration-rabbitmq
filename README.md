@@ -1,13 +1,15 @@
 # newrelic-integration-rabbitmq
 Integration for New Relic Infrastructure written in Go
 
+This integration will be used with a Bosh Release, but I have been testing it out with a local rabbitmq in Docker running newrelic-infra agent.
+
 
 [New Relic Infrastructure Agent](https://docs.newrelic.com/docs/infrastructure/new-relic-infrastructure/installation/install-infrastructure-linux)
 
 [Rabbit-Hole](https://github.com/michaelklishin/rabbit-hole)
 
 
-# Testing
+# Usage
 
 Docker
 `docker run -d --hostname my-rabbit --name some-rabbit -p 15672:15672 rabbitmq:3-management`
@@ -20,7 +22,9 @@ Copy rabbitmq_integration binary to /var/db/newrelic-infra/custom-integrations/b
 Copy rabbitmq_integration-definition.yml to /var/db/newrelic-infra/custom-integrations/
 Copy rabbitmq_integration-config.yml to /etc/newrelic-infra/integrations.d
 
-# Usage
+`newrelic-infra start`
+
+# Testing
 
 `./rabbitmq_integration -pretty`
 
