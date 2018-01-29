@@ -29,7 +29,9 @@ Install New Relic Infrastructure Agent
 Build .go file
 
 Copy rabbitmq_integration binary to /var/db/newrelic-infra/custom-integrations/bin/
+<br>
 Copy rabbitmq_integration-definition.yml to /var/db/newrelic-infra/custom-integrations/
+<br>
 Copy rabbitmq_integration-config.yml to /etc/newrelic-infra/integrations.d
 
 `newrelic-infra start`
