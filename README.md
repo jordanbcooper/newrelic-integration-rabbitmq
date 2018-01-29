@@ -4,9 +4,19 @@ Integration for New Relic Infrastructure written in Go
 This integration will be used with a Bosh Release, but I have been testing it out with a local rabbitmq in Docker running newrelic-infra agent.
 
 
+
+
 [New Relic Infrastructure Agent](https://docs.newrelic.com/docs/infrastructure/new-relic-infrastructure/installation/install-infrastructure-linux)
 
 [Rabbit-Hole](https://github.com/michaelklishin/rabbit-hole)
+
+
+#TO DO
+
+- Add additional metrics and inventory
+
+- Roll into my org's New Relic Infra bosh release
+
 
 
 # Usage
@@ -50,3 +60,9 @@ Output:
         "events": []
 }
 `
+
+# New Relic Insights Dashboard NRQL query
+
+`SELECT average(`Exchanges`) from MyorgMQ_IntegrationSample since 30 minutes ago TIMESERIES AUTO`
+
+
