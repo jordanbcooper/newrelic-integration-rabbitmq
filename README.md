@@ -15,11 +15,11 @@ This integration will be used with a Bosh Release, but I have been testing it ou
 
 #TO DO
 
-- Roll newrelic infrastructure agent into rabbitmq docker image for testing
+-[] Roll newrelic infrastructure agent into rabbitmq docker image for testing
 
-- Add additional metrics and inventory
+-[] Add additional metrics and inventory
 
-- Roll into my org's New Relic Infra bosh release
+-[] Roll into my org's New Relic Infra bosh release
 
 
 
