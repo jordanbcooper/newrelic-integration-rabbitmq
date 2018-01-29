@@ -82,12 +82,19 @@ func populateInventory(inventory sdk.Inventory) {
 }
 
 func populateMetrics(ms *metric.MetricSet) {
-	rmqc := rmqClient()
-	res, err := rmqc.Overview()
-	fatalIfErr(err)
+        rmqc := rmqClient()
+        res, err := rmqc.Overview()
+        fatalIfErr(err)
+        ms.SetMetric("Exchanges", res.ObjectTotals.Exchanges, metric.GAUGE)
+        ms.SetMetric("Queues", res.ObjectTotals.Queues, metric.GAUGE)
+        ms.SetMetric("Connections", res.ObjectTotals.Connections, metric.GAUGE)
+        ms.SetMetric("Channels", res.ObjectTotals.Channels, metric.GAUGE)
+        ms.SetMetric("Consumers", res.ObjectTotals.Consumers, metric.GAUGE)
+        ms.SetMetric("Messages", res.QueueTotals.Messages, metric.GAUGE)
+        ms.SetMetric("Messages Unacknowledged", res.QueueTotals.MessagesUnacknowledged, metric.GAUGE)
+        ms.SetMetric("Messages Ready", res.QueueTotals.MessagesReady, metric.GAUGE)
+        ms.SetMetric("Message Stats | Publish", res.MessageStats.Publish, metric.GAUGE)
 
-	ms.SetMetric("Exchanges", res.ObjectTotals.Exchanges, metric.GAUGE)
-	ms.SetMetric("Consumers", res.ObjectTotals.Consumers, metric.GAUGE)
 }
 
 func fatalIfErr(err error) {
