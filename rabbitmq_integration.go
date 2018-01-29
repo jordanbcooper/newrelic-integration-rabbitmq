@@ -86,7 +86,7 @@ func populateMetrics(ms *metric.MetricSet) {
 	res, err := rmqc.Overview()
 	fatalIfErr(err)
 
-i	ms.SetMetric("Exchanges", res.ObjectTotals.Exchanges, metric.GAUGE)
+	ms.SetMetric("Exchanges", res.ObjectTotals.Exchanges, metric.GAUGE)
 	ms.SetMetric("Consumers", res.ObjectTotals.Consumers, metric.GAUGE)
 }
 
