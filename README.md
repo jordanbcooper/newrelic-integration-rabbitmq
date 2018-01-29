@@ -63,6 +63,6 @@ Output:
 
 # New Relic Insights Dashboard NRQL query
 
-`SELECT average(`Exchanges`) from MyorgMQ_IntegrationSample since 30 minutes ago TIMESERIES AUTO`
+```SELECT average(`Exchanges`) from MyorgMQ_IntegrationSample since 30 minutes ago TIMESERIES AUTO```
 
 
