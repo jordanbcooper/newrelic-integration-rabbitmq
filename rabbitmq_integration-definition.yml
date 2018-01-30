@@ -8,11 +8,11 @@ commands:
     command:
       - ./bin/rabbitmq_integration
       - --metrics
-    interval: 15
+    interval: 1
 
   inventory:
     command:
      - ./bin/rabbitmq_integration
       - --inventory
     prefix: config/rabbitmq_integration
-    interval: 15
+    interval: 1
