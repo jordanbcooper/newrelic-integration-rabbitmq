@@ -12,7 +12,7 @@ commands:
 
   inventory:
     command:
-     - ./bin/rabbitmq_integration
+      - ./bin/rabbitmq_integration
       - --inventory
     prefix: config/rabbitmq_integration
     interval: 1

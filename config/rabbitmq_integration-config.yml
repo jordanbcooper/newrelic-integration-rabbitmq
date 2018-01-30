@@ -4,10 +4,10 @@ instances:
   - name: rabbitmq-metrics
     command: metrics
     labels:
-	env: production
-	role: messages
+      env: production
+      role: messages
 
- - name: rabbitmq-inventory
+  - name: rabbitmq-inventory
     command: inventory
     labels:
       env: production
