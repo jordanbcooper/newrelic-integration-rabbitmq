@@ -53,3 +53,7 @@ logs: ## Output the dev container log
 restart-newrelic: ## Restart the newrelic-infra agent on the dev container (used when changing config files)
 	@echo "restarting newrelic-infra..."
 	docker exec nrrmq-dev /bin/bash -c "initctl restart newrelic-infra"
+
+.PHONY: status
+status: ## Show running newrelic-integration-rabbitmq containers
+	docker ps -f name=nrrmq
