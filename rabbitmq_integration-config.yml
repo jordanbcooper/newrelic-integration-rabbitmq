@@ -9,7 +9,6 @@ instances:
 
  - name: rabbitmq-inventory
     command: inventory
-#    arguments:
-#      arg1: <ARG_VALUE>
-#    labels:
-#      key1: <LABEL_VALUE>
+    labels:
+      env: production
+      role: messages
