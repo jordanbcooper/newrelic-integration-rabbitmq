@@ -45,8 +45,9 @@ Copy `rabbitmq_integration-config.yml` to `/etc/newrelic-infra/integrations.d`
 `./rabbitmq_integration -pretty`
 
 
-`
+
 Output:
+```
 {
         "name": "com.myorg.rabbitmq",
         "protocol_version": "1",
@@ -65,7 +66,7 @@ Output:
         },
         "events": []
 }
-`
+```
 
 # New Relic Insights Dashboard NRQL query
 
