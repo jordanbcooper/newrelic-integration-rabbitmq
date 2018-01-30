@@ -1,0 +1,101 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/Sirupsen/logrus",
+			"repository": "https://github.com/Sirupsen/logrus",
+			"vcs": "git",
+			"revision": "768a92a02685ee7535069fc1581341b41bab9b72",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/michaelklishin/rabbit-hole",
+			"repository": "https://github.com/michaelklishin/rabbit-hole",
+			"vcs": "git",
+			"revision": "60d56241ac2b927bf272b94c9dc693a3c28c4b85",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/newrelic/infra-integrations-sdk/args",
+			"repository": "https://github.com/newrelic/infra-integrations-sdk",
+			"vcs": "git",
+			"revision": "a63d281dac80cf84dd8a0e67e41557ccefdf8f56",
+			"branch": "master",
+			"path": "/args",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/newrelic/infra-integrations-sdk/cache",
+			"repository": "https://github.com/newrelic/infra-integrations-sdk",
+			"vcs": "git",
+			"revision": "a63d281dac80cf84dd8a0e67e41557ccefdf8f56",
+			"branch": "master",
+			"path": "cache",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/newrelic/infra-integrations-sdk/log",
+			"repository": "https://github.com/newrelic/infra-integrations-sdk",
+			"vcs": "git",
+			"revision": "a63d281dac80cf84dd8a0e67e41557ccefdf8f56",
+			"branch": "master",
+			"path": "/log",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/newrelic/infra-integrations-sdk/metric",
+			"repository": "https://github.com/newrelic/infra-integrations-sdk",
+			"vcs": "git",
+			"revision": "a63d281dac80cf84dd8a0e67e41557ccefdf8f56",
+			"branch": "master",
+			"path": "/metric",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/newrelic/infra-integrations-sdk/sdk",
+			"repository": "https://github.com/newrelic/infra-integrations-sdk",
+			"vcs": "git",
+			"revision": "a63d281dac80cf84dd8a0e67e41557ccefdf8f56",
+			"branch": "master",
+			"path": "/sdk",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/sirupsen/logrus",
+			"repository": "https://github.com/sirupsen/logrus",
+			"vcs": "git",
+			"revision": "768a92a02685ee7535069fc1581341b41bab9b72",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/crypto/ssh/terminal",
+			"repository": "https://go.googlesource.com/crypto",
+			"vcs": "git",
+			"revision": "1875d0a70c90e57f11972aefd42276df65e895b9",
+			"branch": "master",
+			"path": "/ssh/terminal",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/sys/unix",
+			"repository": "https://go.googlesource.com/sys",
+			"vcs": "git",
+			"revision": "3dbebcf8efb6a5011a60c2b4591c1022a759af8a",
+			"branch": "master",
+			"path": "/unix",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/sys/windows",
+			"repository": "https://go.googlesource.com/sys",
+			"vcs": "git",
+			"revision": "3dbebcf8efb6a5011a60c2b4591c1022a759af8a",
+			"branch": "master",
+			"path": "windows",
+			"notests": true
+		}
+	]
+}
