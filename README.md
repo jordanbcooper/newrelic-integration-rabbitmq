@@ -21,7 +21,7 @@ This integration will be used with a Bosh Release, but I have been testing it ou
 ## Usage
 
 ### Quick Start
-1. Clone this repo into your `$GOPATH`: `go get github.com/jordanbcooper/newrelic-integration-rabbitmq`
+1. Clone this repo into your `$GOPATH` manually, or with go get: `go get github.com/jordanbcooper/newrelic-integration-rabbitmq`
 1. Ensure you've exported the `NRIA_LICENSE_KEY` environment variable and set it to your NewRelic license key. You can also pass this before a make command if you'd rather not set it permanently: `NRIA_LICENSE_KEY=somekey make dev` **THE CONTAINER WILL NOT RUN UNLESS A VALID NEWRELIC LICENSE IS PROVIDED**
 1. Run `make dev` to start up a Docker container with the integration running in it
 1. Run `make status` to see if your container is running. If it's not, use `make logs` to diagnose the problem, and make sure you passed in a valid NewRelic license per step two.
