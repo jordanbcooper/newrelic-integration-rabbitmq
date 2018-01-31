@@ -67,7 +67,7 @@ necessary during active development after changing any of the files in the `conf
 Running `make status` will show you any running dev containers.
 
 ## New Relic Insights Dashboard NRQL query
-
-```SELECT average(`Exchanges`) from MyorgMQ_IntegrationSample since 30 minutes ago TIMESERIES AUTO```
+Object Totals (Average):
+```SELECT average(Exchanges), average(Consumers), average(Channels), average(Connections) from OrgRabbitMQ_IntegrationSample since 30 minutes ago TIMESERIES AUTO```
 
 
