@@ -1,0 +1,14 @@
+integration_name: com.myorg.rabbitmq_integration
+
+instances:
+  - name: rabbitmq-metrics
+    command: metrics
+    labels:
+      env: production
+      role: messages
+
+  - name: rabbitmq-inventory
+    command: inventory
+    labels:
+      env: production
+      role: messages
