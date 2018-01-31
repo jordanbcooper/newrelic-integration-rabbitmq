@@ -68,6 +68,7 @@ Running `make status` will show you any running dev containers.
 
 ## New Relic Insights Dashboard NRQL query
 
-```SELECT average(`Exchanges`) from MyorgMQ_IntegrationSample since 30 minutes ago TIMESERIES AUTO```
+```SELECT average(Exchanges), average(Consumers), average(Channels), average(Connections) from OrgRabbitMQ_IntegrationSample since 30 minutes ago TIMESERIES AUTO```
 
+![Alt text](nrqldash.jpg?raw=true "Title")
 
