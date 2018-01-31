@@ -12,7 +12,7 @@ init: ## Installs development tooling, for active developers of this integration
 
 .PHONY: build
 build: ## Compiles the integration binary and puts it in ./bin
-	go build -o ./integration/bin/rabbitmq_integration
+	GOOS=linux GOARCH=amd64 go build -o ./integration/bin/rabbitmq_integration
 
 # Undocument by the help command. This helper method creates the dev environment for us
 .PHONY: dev-env
