@@ -35,7 +35,6 @@ init                           Ensures that gvt is installed for dependency mana
 build                          Compiles the integration binary and puts it in ./bin
 dev                            Runs a dev container with the integration binary shared so it can be actively developed
 stop                           Destroys the active dev container, ignores error if container doesn't exist
-purge                          Destroys the active dev container and deletes the latest compiled integration from ./bin
 logs                           Output the dev container log
 restart-newrelic               Restart the newrelic-infra agent on the dev container (used when changing config files)
 status                         Show running newrelic-integration-rabbitmq containers
@@ -59,9 +58,6 @@ Running `make logs` will show the latest logs from the dev container. It's equiv
 
 ### stop
 Stops and destroys the running dev container.
-
-### purge
-Removes the compiled binary from the bin directory and destroys the dev container.
 
 ### restart-newrelic
 Running `make restart-newrelic` will restart the newrelic-infra agent running on the machine using `docker exec`. This is

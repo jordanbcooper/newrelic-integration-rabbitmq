@@ -34,9 +34,6 @@ dev: stop build dev-env ## Runs a dev container with the integration binary shar
 stop: ## Destroys the active dev container, ignores error if container doesn't exist
 	-docker rm -f nrrmq-dev 2>/dev/null
 
-.PHONY: purge
-purge: stop ## Destroys the active dev container
-
 .PHONY: logs
 logs: ## Output the dev container log
 	docker logs nrrmq-dev
