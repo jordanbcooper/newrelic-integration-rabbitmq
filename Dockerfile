@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install newrelic-infra -y
 # Add project files
 COPY ./bin/rabbitmq_integration /var/db/newrelic-infra/custom-integrations/bin/rabbitmq_integration
 COPY ./config/rabbitmq_integration-config.yml /etc/newrelic-infra/integrations.d/rabbitmq_integration-config.yml
-COPY ./config/rabbitmq_integration-definition.yml /var/db/newrelic-infra/custom-integrations/rabbitmq_integration-definition.yml
+COPY integration /var/db/newrelic-infra/custom-integrations/rabbitmq_integration-definition.yml
 
 # Run rabbitmq service and newrelic-infra
 CMD rabbitmq-server start -detached && newrelic-infra start
