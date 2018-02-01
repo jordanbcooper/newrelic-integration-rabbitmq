@@ -35,7 +35,7 @@ func main() {
 
 	if args.All || args.Metrics {
 
-		sample := integration.NewMetricSet("OrgRabbitMQ_IntegrationSample")
+		sample := integration.NewMetricSet("RabbitMQ_IntegrationSample")
 
 		populateMetrics(sample)
 
@@ -81,23 +81,56 @@ func populateInventory(inventory sdk.Inventory) {
 
 }
 
-func populateMetrics(ms *metric.MetricSet) {
-        rmqc := rmqClient()
-        res, err := rmqc.Overview()
-        fatalIfErr(err)
-        // Object Totals
-        ms.SetMetric("Exchanges", res.ObjectTotals.Exchanges, metric.GAUGE)
-        ms.SetMetric("Queues", res.ObjectTotals.Queues, metric.GAUGE)
-        ms.SetMetric("Connections", res.ObjectTotals.Connections, metric.GAUGE)
-        ms.SetMetric("Channels", res.ObjectTotals.Channels, metric.GAUGE)
-        ms.SetMetric("Consumers", res.ObjectTotals.Consumers, metric.GAUGE)
-        //Queue Totals
-        ms.SetMetric("Messages", res.QueueTotals.Messages, metric.GAUGE)
-        ms.SetMetric("Messages Unacknowledged", res.QueueTotals.MessagesUnacknowledged, metric.GAUGE)
-        ms.SetMetric("Messages Ready", res.QueueTotals.MessagesReady, metric.GAUGE)
-        //Message Stats
-        ms.SetMetric("Message Stats | Publish", res.MessageStats.Publish, metric.GAUGE)
+/*
+func countRunningNodes() {
+	rmqc := rmqClient()
+	xs, err := rmqc.ListNodes()
+	var runCount = 0
+	var i = 0
+	for i <= 2 {
+		var nodeIsRunning = xs[i].IsRunning
 
+		if nodeIsRunning {
+			runCount = runCount + 1
+		}
+		i = i + 1
+	}
+	return runCount
+ } */
+
+func populateMetrics(ms *metric.MetricSet) {
+	rmqc := rmqClient()
+	res, err := rmqc.Overview()
+	fatalIfErr(err)
+	xs, err := rmqc.ListNodes()
+
+	//Cluster Running Count (GET ME INTO A FUNCTION!)
+	var runCount = 0
+	var i = 0
+	for i <= 2 {
+		var nodeIsRunning = xs[i].IsRunning
+
+		if nodeIsRunning {
+			runCount = runCount + 1
+		}
+		i = i + 1
+	}
+
+	// Object Totals
+	ms.SetMetric("Exchanges", res.ObjectTotals.Exchanges, metric.GAUGE)
+	ms.SetMetric("Queues", res.ObjectTotals.Queues, metric.GAUGE)
+	ms.SetMetric("Connections", res.ObjectTotals.Connections, metric.GAUGE)
+	ms.SetMetric("Channels", res.ObjectTotals.Channels, metric.GAUGE)
+	ms.SetMetric("Consumers", res.ObjectTotals.Consumers, metric.GAUGE)
+	//Queue Totals
+	ms.SetMetric("Messages", res.QueueTotals.Messages, metric.GAUGE)
+	ms.SetMetric("Messages Unacknowledged", res.QueueTotals.MessagesUnacknowledged, metric.GAUGE)
+	ms.SetMetric("Messages Ready", res.QueueTotals.MessagesReady, metric.GAUGE)
+	//Message Stats
+	ms.SetMetric("Publish", res.MessageStats.Publish, metric.GAUGE)
+	ms.SetMetric("Deliver", res.MessageStats.Deliver, metric.GAUGE)
+	//Cluster Status
+	ms.SetMetric("Running", runCount, metric.GAUGE)
 }
 
 func fatalIfErr(err error) {
