@@ -8,6 +8,7 @@ import (
 	"github.com/newrelic/infra-integrations-sdk/metric"
 	"github.com/newrelic/infra-integrations-sdk/sdk"
 	"os"
+	//"encoding/json"
 )
 
 type argumentList struct {
@@ -81,33 +82,16 @@ func populateInventory(inventory sdk.Inventory) {
 
 }
 
-/*
-func countRunningNodes() {
-	rmqc := rmqClient()
-	xs, err := rmqc.ListNodes()
-	var runCount = 0
-	var i = 0
-	for i <= 2 {
-		var nodeIsRunning = xs[i].IsRunning
-
-		if nodeIsRunning {
-			runCount = runCount + 1
-		}
-		i = i + 1
-	}
-	return runCount
- } */
-
 func populateMetrics(ms *metric.MetricSet) {
 	rmqc := rmqClient()
 	res, err := rmqc.Overview()
 	fatalIfErr(err)
 	xs, err := rmqc.ListNodes()
-
 	//Cluster Running Count (GET ME INTO A FUNCTION!)
 	var runCount = 0
+	var nodeCount = len(xs) 
 	var i = 0
-	for i <= 2 {
+	for i <= nodeCount - 1 {
 		var nodeIsRunning = xs[i].IsRunning
 
 		if nodeIsRunning {
