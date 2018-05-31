@@ -10,10 +10,10 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/michaelklishin/rabbit-hole",
-			"repository": "https://github.com/michaelklishin/rabbit-hole",
+			"importpath": "github.com/jordanbcooper/rabbit-hole",
+			"repository": "https://github.com/jordanbcooper/rabbit-hole",
 			"vcs": "git",
-			"revision": "60d56241ac2b927bf272b94c9dc693a3c28c4b85",
+			"revision": "c8c8aad2b2afd3694f161e05f1f0843076315978",
 			"branch": "master",
 			"notests": true
 		},
