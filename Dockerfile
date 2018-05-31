@@ -18,9 +18,9 @@ RUN printf "deb [arch=amd64] https://download.newrelic.com/infrastructure_agent/
 RUN apt-get update && apt-get install newrelic-infra -y
 
 # Add project files
-COPY ./integration/bin/rabbitmq_integration /var/db/newrelic-infra/custom-integrations/bin/rabbitmq_integration
-COPY ./config/rabbitmq_integration-config.yml /etc/newrelic-infra/integrations.d/rabbitmq_integration-config.yml
-COPY ./integration/rabbitmq_integration-definition.yml /var/db/newrelic-infra/custom-integrations/rabbitmq_integration-definition.yml
+COPY ./integration/bin/rabbitmq /var/db/newrelic-infra/custom-integrations/bin/rabbitmq
+COPY ./config/rabbitmq-config.yml /etc/newrelic-infra/integrations.d/rabbitmq-config.yml
+COPY ./integration/rabbitmq-definition.yml /var/db/newrelic-infra/custom-integrations/rabbitmq-definition.yml
 
 # Run rabbitmq service and newrelic-infra
 CMD rabbitmq-server start -detached && newrelic-infra start
