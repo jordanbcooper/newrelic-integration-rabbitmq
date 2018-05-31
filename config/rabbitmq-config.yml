@@ -1,0 +1,8 @@
+integration_name: com.org.rabbitmq
+
+instances:
+  - name: rabbitmq-metrics
+    command: metrics
+    arguments:
+      RMQ_USERNAME:
+      RMQ_PASSWORD: 
