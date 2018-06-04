@@ -129,8 +129,8 @@ func populateMetrics(ms *metric.MetricSet) {
 	ms.SetMetric("Messages Unacknowledged", res.QueueTotals.MessagesUnacknowledged, metric.GAUGE)
 	ms.SetMetric("Messages Ready", res.QueueTotals.MessagesReady, metric.GAUGE)
 	//Message Stats
-	ms.SetMetric("Publish", res.MessageStats.Publish, metric.GAUGE)
-	ms.SetMetric("Deliver", res.MessageStats.Deliver, metric.GAUGE)
+	ms.SetMetric("Publish", res.MessageStats.PublishDetails, metric.GAUGE)
+	ms.SetMetric("Deliver", res.MessageStats.DeliverDetails, metric.GAUGE)
 	//Cluster Status
 	ms.SetMetric("Running", runCount, metric.GAUGE)
 
