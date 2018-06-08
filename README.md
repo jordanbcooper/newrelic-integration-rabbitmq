@@ -10,7 +10,7 @@ This integration will be used with a Bosh Release, but I have been testing it ou
 [Rabbit-Hole](https://github.com/michaelklishin/rabbit-hole) 
 
 [Rabbit-Hole (Fork)](https://github.com/jordanbcooper/rabbit-hole)
-^ Used by this repo
+< Used by this repo
 
 ## Usage
 
