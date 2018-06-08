@@ -95,29 +95,18 @@ func populateMetrics(ms *metric.MetricSet) {
 
 		if nodeIsRunning {
 			runCount = runCount + 1
+			fduVar := fmt.Sprintf("Node %v File Descriptors Used (%s)", i, xs[i].Name)
+			fdtVar := fmt.Sprintf("Node %v File Descriptors Total (%s)", i, xs[i].Name)
+			procuVar := fmt.Sprintf("Node %v Erlang Processes Used (%s)", i, xs[i].Name)
+			proctVar := fmt.Sprintf("Node %v Erlang Processes Total (%s)", i, xs[i].Name)
+			ms.SetMetric(fduVar, xs[i].FdUsed, metric.GAUGE)
+			ms.SetMetric(fdtVar, xs[i].FdTotal, metric.GAUGE)
+			ms.SetMetric(procuVar, xs[i].ProcUsed, metric.GAUGE)
+			ms.SetMetric(proctVar, xs[i].ProcTotal, metric.GAUGE)
 		}
 		i = i + 1
 	}
 
-	// Node Info
-	ms.SetMetric("Node One", xs[0].Name, metric.ATTRIBUTE)
-	ms.SetMetric("Node One File Descriptors Used", xs[0].FdUsed, metric.GAUGE)
-	ms.SetMetric("Node One File Descriptors Total", xs[0].FdTotal, metric.GAUGE)
-	ms.SetMetric("Node One Erlang Processes Used", xs[0].ProcUsed, metric.GAUGE)
-	ms.SetMetric("Node One Erlang Processes Total", xs[0].ProcTotal, metric.GAUGE)
-
-	// Node Two
-	ms.SetMetric("Node Two", xs[1].Name, metric.ATTRIBUTE)
-	ms.SetMetric("Node Two File Descriptors Used", xs[1].FdUsed, metric.GAUGE)
-	ms.SetMetric("Node Two File Descriptors Total", xs[1].FdTotal, metric.GAUGE)
-	ms.SetMetric("Node Two Erlang Processes Used", xs[1].ProcUsed, metric.GAUGE)
-	ms.SetMetric("Node Two Erlang Processes Total", xs[1].ProcTotal, metric.GAUGE)
-	//Node Three
-	ms.SetMetric("Node Three", xs[2].Name, metric.ATTRIBUTE)
-	ms.SetMetric("Node Three File Descriptors Used", xs[2].FdUsed, metric.GAUGE)
-	ms.SetMetric("Node Three File Descriptors Total", xs[2].FdTotal, metric.GAUGE)
-	ms.SetMetric("Node Three Erlang Processes Used", xs[2].ProcUsed, metric.GAUGE)
-	ms.SetMetric("Node Three Erlang Processes Total", xs[2].ProcTotal, metric.GAUGE)
 	// Object Totals
 	ms.SetMetric("Exchanges", res.ObjectTotals.Exchanges, metric.GAUGE)
 	ms.SetMetric("Queues", res.ObjectTotals.Queues, metric.GAUGE)
