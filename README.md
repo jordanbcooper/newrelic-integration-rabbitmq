@@ -66,7 +66,7 @@ Object Totals (Average):
 <br>
 
 ## Expected Output
-
+```
 {
   "name": "com.org.rabbitmq",
   "protocol_version": "1",
@@ -114,3 +114,4 @@ Object Totals (Average):
   },
   "events": []
 }
+```
