@@ -7,8 +7,10 @@ This integration will be used with a Bosh Release, but I have been testing it ou
 
 [New Relic Infrastructure Agent SDK](https://github.com/newrelic/infra-integrations-sdk)
 
-[Rabbit-Hole](https://github.com/michaelklishin/rabbit-hole)
+[Rabbit-Hole](https://github.com/michaelklishin/rabbit-hole) 
 
+[Rabbit-Hole (Fork)](https://github.com/jordanbcooper/rabbit-hole)
+< Used by this repo
 
 ## Usage
 
@@ -66,7 +68,7 @@ Object Totals (Average):
 <br>
 
 ## Expected Output
-
+```
 {
   "name": "com.org.rabbitmq",
   "protocol_version": "1",
@@ -114,3 +116,4 @@ Object Totals (Average):
   },
   "events": []
 }
+```
