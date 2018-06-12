@@ -95,10 +95,10 @@ func populateMetrics(ms *metric.MetricSet) {
 
 		if nodeIsRunning {
 			runCount = runCount + 1
-			fduVar := fmt.Sprintf("Node %v File Descriptors Used (%s)", i, xs[i].Name)
-			fdtVar := fmt.Sprintf("Node %v File Descriptors Total (%s)", i, xs[i].Name)
-			procuVar := fmt.Sprintf("Node %v Erlang Processes Used (%s)", i, xs[i].Name)
-			proctVar := fmt.Sprintf("Node %v Erlang Processes Total (%s)", i, xs[i].Name)
+			fduVar := fmt.Sprintf("Node %v File Descriptors Used", i)
+			fdtVar := fmt.Sprintf("Node %v File Descriptors Total", i)
+			procuVar := fmt.Sprintf("Node %v Erlang Processes Used", i)
+			proctVar := fmt.Sprintf("Node %v Erlang Processes Total", i)
 			ms.SetMetric(fduVar, xs[i].FdUsed, metric.GAUGE)
 			ms.SetMetric(fdtVar, xs[i].FdTotal, metric.GAUGE)
 			ms.SetMetric(procuVar, xs[i].ProcUsed, metric.GAUGE)
