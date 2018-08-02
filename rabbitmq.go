@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
+	"net/url"
+	"os"
+	"strconv"
+
 	"github.com/jordanbcooper/rabbit-hole"
 	sdkargs "github.com/newrelic/infra-integrations-sdk/args"
 	"github.com/newrelic/infra-integrations-sdk/log"
 	"github.com/newrelic/infra-integrations-sdk/metric"
 	"github.com/newrelic/infra-integrations-sdk/sdk"
-	"net/url"
-	"os"
-	"strconv"
 	//"encoding/json"
 )
 
@@ -116,52 +117,46 @@ func populateMetrics(ms *metric.MetricSet) {
 		fmt.Println(err.Error())
 	}
 	jobs := make(chan int, qs.PageCount)
+	results := make(chan int, qs.PageCount)
 
+	if qs.PageCount == 0 {
+		fmt.Println("no queues")
+		return
+	}
 	workerCount := 5
 	if workerCount > qs.PageCount {
 		workerCount = qs.PageCount
 	}
+	fmt.Println("Paging over ", qs.PageCount)
 
 	for w := 1; w <= workerCount; w++ {
-		go func(jobs <-chan int) {
-			fmt.Println("Starting jobs")
+		go func(jobs <-chan int, results chan<- int) {
 			for j := range jobs {
-				fmt.Println("String", j)
-				values := url.Values{"page": {strconv.Itoa(j)}}
+				values := url.Values{"page": {strconv.Itoa(1)}}
 				rs, err := rmqc.PagedListQueuesWithParameters(values)
 				if err != nil {
 					fmt.Println(err.Error())
 				}
-				fmt.Println(rs.Items, "Test")
 				for _, queue := range rs.Items {
 					fmt.Println(queue.Vhost, queue.Name)
 					vhostQueue := queue.Vhost + "/" + queue.Name
 					fmt.Println(vhostQueue)
 					ms.SetMetric(vhostQueue, queue.Messages, metric.GAUGE)
 				}
+				fmt.Println("Page finsished", j)
+				results <- j
 			}
-			fmt.Println("Job done", w)
-		}(jobs)
+		}(jobs, results)
 
 	}
 	for currentPage := 1; currentPage <= qs.PageCount; currentPage++ {
-		fmt.Println(currentPage)
 		jobs <- currentPage
 	}
 	close(jobs)
-	//	for currentPage := 1; currentPage <= qs.PageCount; currentPage++ {
-	//		values := url.Values{"page": {strconv.Itoa(currentPage)}}
-	//		rs, err := rmqc.PagedListQueuesWithParameters(values)
-	//		if err != nil {
-	//			fmt.Println(err.Error())
-	//		}
-	//		for _, queue := range rs.Items {
-	//			vhostQueue := queue.Vhost + "/" + queue.Name
-	//			ms.SetMetric(vhostQueue, queue.Messages, metric.GAUGE)
-	//		}
-	//
-	//	}
 
+	for a := 1; a <= qs.PageCount; a++ {
+		<-results
+	}
 	// Object Totals
 	ms.SetMetric("Exchanges", res.ObjectTotals.Exchanges, metric.GAUGE)
 	ms.SetMetric("Queues", res.ObjectTotals.Queues, metric.GAUGE)
