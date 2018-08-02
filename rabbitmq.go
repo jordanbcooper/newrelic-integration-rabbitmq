@@ -7,7 +7,9 @@ import (
 	"github.com/newrelic/infra-integrations-sdk/log"
 	"github.com/newrelic/infra-integrations-sdk/metric"
 	"github.com/newrelic/infra-integrations-sdk/sdk"
+	"net/url"
 	"os"
+	"strconv"
 	//"encoding/json"
 )
 
@@ -106,6 +108,27 @@ func populateMetrics(ms *metric.MetricSet) {
 		}
 		i = i + 1
 	}
+
+	values := url.Values{"page": {"1"}}
+	// values := url.Values{}
+	qs, err := rmqc.PagedListQueuesWithParameters(values)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	for currentPage := 1; currentPage <= qs.PageCount; currentPage++ {
+		values := url.Values{"page": {strconv.Itoa(currentPage)}}
+		rs, err := rmqc.PagedListQueuesWithParameters(values)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		for _, queue := range rs.Items {
+			vhostQueue := queue.Vhost + "/" + queue.Name
+			ms.SetMetric(vhostQueue, queue.Messages, metric.GAUGE)
+		}
+
+	}
+	//fmt.Println(qs)
 
 	// Object Totals
 	ms.SetMetric("Exchanges", res.ObjectTotals.Exchanges, metric.GAUGE)
