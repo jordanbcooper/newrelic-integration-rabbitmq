@@ -115,20 +115,52 @@ func populateMetrics(ms *metric.MetricSet) {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
+	jobs := make(chan int, qs.PageCount)
 
-	for currentPage := 1; currentPage <= qs.PageCount; currentPage++ {
-		values := url.Values{"page": {strconv.Itoa(currentPage)}}
-		rs, err := rmqc.PagedListQueuesWithParameters(values)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-		for _, queue := range rs.Items {
-			vhostQueue := queue.Vhost + "/" + queue.Name
-			ms.SetMetric(vhostQueue, queue.Messages, metric.GAUGE)
-		}
+	workerCount := 5
+	if workerCount > qs.PageCount {
+		workerCount = qs.PageCount
+	}
+
+	for w := 1; w <= workerCount; w++ {
+		go func(jobs <-chan int) {
+			fmt.Println("Starting jobs")
+			for j := range jobs {
+				fmt.Println("String", j)
+				values := url.Values{"page": {strconv.Itoa(j)}}
+				rs, err := rmqc.PagedListQueuesWithParameters(values)
+				if err != nil {
+					fmt.Println(err.Error())
+				}
+				fmt.Println(rs.Items, "Test")
+				for _, queue := range rs.Items {
+					fmt.Println(queue.Vhost, queue.Name)
+					vhostQueue := queue.Vhost + "/" + queue.Name
+					fmt.Println(vhostQueue)
+					ms.SetMetric(vhostQueue, queue.Messages, metric.GAUGE)
+				}
+			}
+			fmt.Println("Job done", w)
+		}(jobs)
 
 	}
-	//fmt.Println(qs)
+	for currentPage := 1; currentPage <= qs.PageCount; currentPage++ {
+		fmt.Println(currentPage)
+		jobs <- currentPage
+	}
+	close(jobs)
+	//	for currentPage := 1; currentPage <= qs.PageCount; currentPage++ {
+	//		values := url.Values{"page": {strconv.Itoa(currentPage)}}
+	//		rs, err := rmqc.PagedListQueuesWithParameters(values)
+	//		if err != nil {
+	//			fmt.Println(err.Error())
+	//		}
+	//		for _, queue := range rs.Items {
+	//			vhostQueue := queue.Vhost + "/" + queue.Name
+	//			ms.SetMetric(vhostQueue, queue.Messages, metric.GAUGE)
+	//		}
+	//
+	//	}
 
 	// Object Totals
 	ms.SetMetric("Exchanges", res.ObjectTotals.Exchanges, metric.GAUGE)
