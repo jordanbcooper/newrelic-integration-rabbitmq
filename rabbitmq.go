@@ -2,21 +2,28 @@ package main
 
 import (
 	"fmt"
-	"net/url"
-	"os"
-	"strconv"
-	"sync"
-
+	"github.com/caarlos0/env"
 	"github.com/jordanbcooper/rabbit-hole"
 	sdkargs "github.com/newrelic/infra-integrations-sdk/args"
 	"github.com/newrelic/infra-integrations-sdk/log"
 	"github.com/newrelic/infra-integrations-sdk/metric"
 	"github.com/newrelic/infra-integrations-sdk/sdk"
+	"net/url"
+	//	"os"
+	"strconv"
+	"sync"
 	//"encoding/json"
 )
 
 type argumentList struct {
 	sdkargs.DefaultArgumentList
+}
+
+type Config struct {
+	Workers  int    `env:"QUEUE_FETCH_WORKER_COUNT"`
+	User     string `env:"RMQ_USERNAME"`
+	Password string `env:"RMQ_PASSWORD"`
+	Host     string `env:"RMQ_HOSTNAME"`
 }
 
 const (
@@ -50,28 +57,9 @@ func main() {
 }
 
 func rmqClient() *rabbithole.Client {
-
-	rmqUser := os.Getenv("RMQ_USERNAME")
-	if rmqUser == "" {
-		rmqUser = "guest"
-	}
-
-	rmqHostname := os.Getenv("RMQ_HOSTNAME")
-	if rmqHostname == "" {
-		rmqHostname = "http://localhost"
-	}
-
-	rmqPort := os.Getenv("RMQ_PORT")
-	if rmqPort == "" {
-		rmqPort = "15672"
-	}
-
-	rmqPassword := os.Getenv("RMQ_PASSWORD")
-	if rmqPassword == "" {
-		rmqPassword = "guest"
-	}
-
-	rmqc, err := rabbithole.NewClient(fmt.Sprintf("%s:%s", rmqHostname, rmqPort), rmqUser, rmqPassword)
+	cfg := Config{}
+	env.Parse(&cfg)
+	rmqc, err := rabbithole.NewClient(cfg.Host, cfg.User, cfg.Password)
 	fatalIfErr(err)
 
 	return rmqc
@@ -145,7 +133,9 @@ func populateMetrics(ms *metric.MetricSet) {
 	var mutex = &sync.Mutex{}
 	// TODO allow QueueFetchWorkerCount to be configurable in boshrelease
 	// Should default to 1 in the boshrelease
-	workerCount := 4
+	cfg := Config{}
+	env.Parse(&cfg)
+	workerCount := cfg.Workers
 	if workerCount > qs.PageCount {
 		workerCount = qs.PageCount
 	}

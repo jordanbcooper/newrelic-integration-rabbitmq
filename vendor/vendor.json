@@ -3,6 +3,12 @@
 	"ignore": "",
 	"package": [
 		{
+			"checksumSHA1": "EbD1CzPRtlwxH62oS10ky7kRGWY=",
+			"path": "github.com/caarlos0/env",
+			"revision": "bc122c26dc2d72f6904a9e0cb940ca508660067c",
+			"revisionTime": "2018-07-02T19:56:40Z"
+		},
+		{
 			"checksumSHA1": "7DF7WYn82F71wW4vnTVIHZ9dIqo=",
 			"path": "github.com/jordanbcooper/rabbit-hole",
 			"revision": "c8c8aad2b2afd3694f161e05f1f0843076315978",
