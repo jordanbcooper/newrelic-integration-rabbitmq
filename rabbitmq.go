@@ -85,6 +85,7 @@ func worker(mutex *sync.Mutex, rmqc *rabbithole.Client, ms *metric.MetricSet, wo
 			// fmt.Println(vhostQueue, queue.Messages) // uncomment to log queues stats
 			mutex.Lock() // We're using a mutex because the version of infra sdk uses map that is not threadsafe
 			ms.SetMetric(vhostQueue, queue.Messages, metric.GAUGE)
+			ms.SetMetric(vhostQueue+" "+"Rate", queue.MessagesDetails.Rate, metric.RATE)
 			mutex.Unlock()
 		}
 		fmt.Println(fmt.Sprintf("Finishing page %d worker %d", j, workerId))
