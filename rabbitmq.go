@@ -94,7 +94,7 @@ func worker(mutex *sync.Mutex, rmqc *rabbithole.Client, ms *metric.MetricSet, wo
 		}
 		for _, queue := range rs.Items {
 			vhostQueue := queue.Vhost + "/" + queue.Name
-			// fmt.Println(vhostQueue, queue.Messages)
+			// We're using a mutex because the version of infra sdk uses map that is not threadsafe
 			mutex.Lock()
 			ms.SetMetric(vhostQueue, queue.Messages, metric.GAUGE)
 			mutex.Unlock()
@@ -144,6 +144,7 @@ func populateMetrics(ms *metric.MetricSet) {
 	}
 	var mutex = &sync.Mutex{}
 	// TODO allow QueueFetchWorkerCount to be configurable in boshrelease
+	// Should default to 1 in the boshrelease
 	workerCount := 4
 	if workerCount > qs.PageCount {
 		workerCount = qs.PageCount
