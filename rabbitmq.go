@@ -47,11 +47,10 @@ func main() {
 	}
 
 	if args.All() || args.Metrics {
-		// api/overview
+		// overview
 		overview := entityOverview.NewMetricSet("RabbitMQ_Overview")
 		populateOverview(overview)
-		// Queue Messages
-		// Generate Entities
+		// queues
 		values := url.Values{"page": {"1"}}
 		qs, err := rmqc.PagedListQueuesWithParameters(values)
 		panicOnErr(err)
@@ -67,10 +66,9 @@ func main() {
 				queues := entityQueues.NewMetricSet("Rabbitmq_Queues")
 				populateQueues(queues)
 			}
+			panicOnErr(i.Publish())
 		}
-
 	}
-	panicOnErr(i.Publish())
 }
 
 func rmqClient() *rabbithole.Client {
@@ -134,14 +132,9 @@ func populateOverview(ms *metric.Set) {
 
 }
 
-func populateQueues(queues *metric.Set) {
-	rmqc := rmqClient()
-	values := url.Values{"page": {"1"}}
-	// values := url.Values{}
-	qs, err := rmqc.PagedListQueuesWithParameters(values)
-	panicOnErr(err)
-	for currentPage := 1; currentPage <= qs.PageCount; currentPage++ {
-		values := url.Values{"page": {strconv.Itoa(currentPage)}}
+func worker(rmqc *rabbithole.Client, queues *metric.Set, workerId int, jobs <-chan int, results chan<- int) {
+	for j := range jobs {
+		values := url.Values{"page": {strconv.Itoa(j)}}
 		rs, err := rmqc.PagedListQueuesWithParameters(values)
 		panicOnErr(err)
 		for _, queue := range rs.Items {
@@ -151,8 +144,44 @@ func populateQueues(queues *metric.Set) {
 			queues.SetMetric("messages_ready", queue.MessagesReady, metric.GAUGE)
 			queues.SetMetric("messages_unacknowledged", queue.MessagesUnacknowledged, metric.GAUGE)
 		}
+		results <- j
+	}
+}
+
+func populateQueues(queues *metric.Set) {
+	rmqc := rmqClient()
+	values := url.Values{"page": {"1"}}
+	// values := url.Values{}
+	qs, err := rmqc.PagedListQueuesWithParameters(values)
+	panicOnErr(err)
+	results := make(chan int, qs.PageCount)
+	if qs.PageCount == 0 {
+		fmt.Println("no queues")
+		return
+	}
+	// TODO allow QueueFetchWorkerCount to be configurable in boshrelease
+	// Should default to 1 in the boshrelease
+	cfg := Config{}
+	env.Parse(&cfg)
+	workerCount := cfg.Workers
+	if workerCount > qs.PageCount {
+		workerCount = qs.PageCount
+	}
+
+	jobs := make(chan int, workerCount)
+	for w := 1; w <= workerCount; w++ {
+		go worker(rmqc, queues, w, jobs, results)
 
 	}
+	for currentPage := 1; currentPage <= qs.PageCount; currentPage++ {
+		jobs <- currentPage
+	}
+	close(jobs)
+
+	for a := 1; a <= qs.PageCount; a++ {
+		<-results
+	}
+
 }
 
 func panicOnErr(err error) {
