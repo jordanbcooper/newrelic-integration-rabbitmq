@@ -4,19 +4,16 @@ import (
 	"fmt"
 	"github.com/caarlos0/env"
 	"github.com/jordanbcooper/rabbit-hole"
-	sdkargs "github.com/newrelic/infra-integrations-sdk/args"
-	"github.com/newrelic/infra-integrations-sdk/log"
-	"github.com/newrelic/infra-integrations-sdk/metric"
-	"github.com/newrelic/infra-integrations-sdk/sdk"
+	sdkArgs "github.com/newrelic/infra-integrations-sdk/args"
+	"github.com/newrelic/infra-integrations-sdk/data/inventory"
+	"github.com/newrelic/infra-integrations-sdk/data/metric"
+	"github.com/newrelic/infra-integrations-sdk/integration"
 	"net/url"
-	//	"os"
 	"strconv"
-	"sync"
-	//"encoding/json"
 )
 
 type argumentList struct {
-	sdkargs.DefaultArgumentList
+	sdkArgs.DefaultArgumentList
 }
 
 type Config struct {
@@ -35,68 +32,158 @@ var args argumentList
 
 func main() {
 
-	integration, err := sdk.NewIntegration(integrationName, integrationVersion, &args)
-	fatalIfErr(err)
-	log.SetupLogging(args.Verbose)
+	i, err := integration.New(integrationName, integrationVersion, integration.Args(&args))
+	panicOnErr(err)
 
-	if args.All || args.Inventory {
+	entity := i.LocalEntity()
 
-		populateInventory(integration.Inventory)
+	if args.All() || args.Inventory {
+
+		populateInventory(entity.Inventory)
 
 	}
 
-	if args.All || args.Metrics {
+	if args.All() || args.Metrics {
 
-		sample := integration.NewMetricSet("RabbitMQ_Sample")
-
+		sample := entity.NewMetricSet("RabbitMQ_Sample")
+		queues := entity.NewMetricSet("RabbitMQ_Queues")
+		rates := entity.NewMetricSet("RabbitMQ_QueueRates")
 		populateMetrics(sample)
+		populateQueues(queues)
+		populateQueueMessageRates(rates)
 
 	}
 
-	fatalIfErr(integration.Publish())
+	panicOnErr(i.Publish())
 }
 
 func rmqClient() *rabbithole.Client {
 	cfg := Config{}
 	env.Parse(&cfg)
 	rmqc, err := rabbithole.NewClient(cfg.Host, cfg.User, cfg.Password)
-	fatalIfErr(err)
+	panicOnErr(err)
 
 	return rmqc
 }
 
-func populateInventory(inventory sdk.Inventory) {
+func populateInventory(i *inventory.Inventory) {
 	rmqc := rmqClient()
 	res, err := rmqc.Overview()
-	fatalIfErr(err)
+	panicOnErr(err)
 
-	inventory.SetItem("Software Version", "value", res.ManagementVersion)
+	i.SetItem("Software Version", "value", res.ManagementVersion)
 }
-func worker(mutex *sync.Mutex, rmqc *rabbithole.Client, ms *metric.MetricSet, workerId int, jobs <-chan int, results chan<- int) {
+func worker(rmqc *rabbithole.Client, ms *metric.Set, workerId int, jobs <-chan int, results chan<- int) {
 	for j := range jobs {
-		fmt.Println(fmt.Sprintf("Starting page %d worker %d", j, workerId))
 		values := url.Values{"page": {strconv.Itoa(j)}}
 		rs, err := rmqc.PagedListQueuesWithParameters(values)
 		if err != nil {
-			fmt.Println(err.Error())
+			panicOnErr(err)
 		}
 		for _, queue := range rs.Items {
 			vhostQueue := queue.Vhost + "/" + queue.Name
-			// fmt.Println(vhostQueue, queue.Messages) // uncomment to log queues stats
-			mutex.Lock() // We're using a mutex because the version of infra sdk uses map that is not threadsafe
 			ms.SetMetric(vhostQueue, queue.Messages, metric.GAUGE)
-			ms.SetMetric(vhostQueue+" "+"Rate", queue.MessagesDetails.Rate, metric.RATE)
-			mutex.Unlock()
 		}
-		fmt.Println(fmt.Sprintf("Finishing page %d worker %d", j, workerId))
 		results <- j
 	}
 }
 
-func populateMetrics(ms *metric.MetricSet) {
+func worker2(rmqc *rabbithole.Client, ms *metric.Set, workerId int, jobs2 <-chan int, results2 chan<- int) {
+	for j2 := range jobs2 {
+
+		values := url.Values{"page": {strconv.Itoa(j2)}}
+		rs, err := rmqc.PagedListQueuesWithParameters(values)
+		if err != nil {
+			panicOnErr(err)
+		}
+		for _, queue := range rs.Items {
+			vhostQueue := queue.Vhost + "/" + queue.Name
+			ms.SetMetric(vhostQueue, queue.MessagesDetails.Rate, metric.GAUGE)
+		}
+		results2 <- j2
+	}
+}
+
+func populateQueues(ms *metric.Set) {
+	rmqc := rmqClient()
+	values := url.Values{"page": {"1"}}
+	// values := url.Values{}
+	qs, err := rmqc.PagedListQueuesWithParameters(values)
+	if err != nil {
+		panicOnErr(err)
+	}
+	results := make(chan int, qs.PageCount)
+
+	if qs.PageCount == 0 {
+		fmt.Println("no queues")
+		return
+	}
+	// TODO allow QueueFetchWorkerCount to be configurable in boshrelease
+	// Should default to 1 in the boshrelease
+	cfg := Config{}
+	env.Parse(&cfg)
+	workerCount := cfg.Workers
+	if workerCount > qs.PageCount {
+		workerCount = qs.PageCount
+	}
+
+	jobs := make(chan int, workerCount)
+	for w := 1; w <= workerCount; w++ {
+		go worker(rmqc, ms, w, jobs, results)
+
+	}
+	for currentPage := 1; currentPage <= qs.PageCount; currentPage++ {
+		jobs <- currentPage
+	}
+	close(jobs)
+
+	for a := 1; a <= qs.PageCount; a++ {
+		<-results
+	}
+}
+
+func populateQueueMessageRates(ms *metric.Set) {
+	rmqc := rmqClient()
+	values := url.Values{"page": {"1"}}
+	// values := url.Values{}
+	qs, err := rmqc.PagedListQueuesWithParameters(values)
+	if err != nil {
+		panicOnErr(err)
+	}
+	results2 := make(chan int, qs.PageCount)
+
+	if qs.PageCount == 0 {
+		fmt.Println("no queues")
+		return
+	}
+	// TODO allow QueueFetchWorkerCount to be configurable in boshrelease
+	// Should default to 1 in the boshrelease
+	cfg := Config{}
+	env.Parse(&cfg)
+	workerCount := cfg.Workers
+	if workerCount > qs.PageCount {
+		workerCount = qs.PageCount
+	}
+
+	jobs2 := make(chan int, workerCount)
+	for w2 := 1; w2 <= workerCount; w2++ {
+		go worker(rmqc, ms, w2, jobs2, results2)
+
+	}
+	for currentPage := 1; currentPage <= qs.PageCount; currentPage++ {
+		jobs2 <- currentPage
+	}
+	close(jobs2)
+
+	for a := 1; a <= qs.PageCount; a++ {
+		<-results2
+	}
+}
+
+func populateMetrics(ms *metric.Set) {
 	rmqc := rmqClient()
 	res, err := rmqc.Overview()
-	fatalIfErr(err)
+	panicOnErr(err)
 	xs, err := rmqc.ListNodes()
 	//Cluster Running Count (GET ME INTO A FUNCTION!)
 	var runCount = 0
@@ -119,42 +206,6 @@ func populateMetrics(ms *metric.MetricSet) {
 		i = i + 1
 	}
 
-	values := url.Values{"page": {"1"}}
-	// values := url.Values{}
-	qs, err := rmqc.PagedListQueuesWithParameters(values)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	results := make(chan int, qs.PageCount)
-
-	if qs.PageCount == 0 {
-		fmt.Println("no queues")
-		return
-	}
-	var mutex = &sync.Mutex{}
-	// TODO allow QueueFetchWorkerCount to be configurable in boshrelease
-	// Should default to 1 in the boshrelease
-	cfg := Config{}
-	env.Parse(&cfg)
-	workerCount := cfg.Workers
-	if workerCount > qs.PageCount {
-		workerCount = qs.PageCount
-	}
-	jobs := make(chan int, workerCount)
-	fmt.Println("Starting to fetch queue stats with worker count of: ", workerCount)
-	for w := 1; w <= workerCount; w++ {
-		go worker(mutex, rmqc, ms, w, jobs, results)
-
-	}
-	for currentPage := 1; currentPage <= qs.PageCount; currentPage++ {
-		fmt.Println("Sending queue page collector job number: ", currentPage)
-		jobs <- currentPage
-	}
-	close(jobs)
-
-	for a := 1; a <= qs.PageCount; a++ {
-		<-results
-	}
 	// Object Totals
 	ms.SetMetric("Exchanges", res.ObjectTotals.Exchanges, metric.GAUGE)
 	ms.SetMetric("Queues", res.ObjectTotals.Queues, metric.GAUGE)
@@ -173,8 +224,8 @@ func populateMetrics(ms *metric.MetricSet) {
 
 }
 
-func fatalIfErr(err error) {
+func panicOnErr(err error) {
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }
