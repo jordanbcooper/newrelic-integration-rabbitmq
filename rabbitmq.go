@@ -51,24 +51,9 @@ func main() {
 		overview := entityOverview.NewMetricSet("RabbitMQ_Overview")
 		populateOverview(overview)
 		// queues
-		values := url.Values{"page": {"1"}}
-		qs, err := rmqc.PagedListQueuesWithParameters(values)
-		panicOnErr(err)
-
-		for currentPage := 1; currentPage <= qs.PageCount; currentPage++ {
-			values := url.Values{"page": {strconv.Itoa(currentPage)}}
-			rs, err := rmqc.PagedListQueuesWithParameters(values)
-			panicOnErr(err)
-			for _, queue := range rs.Items {
-				vhostQueue := queue.Vhost + "/" + queue.Name
-				entityQueues, err := i.Entity(vhostQueue, "rabbitmq_queue")
-				panicOnErr(err)
-				queues := entityQueues.NewMetricSet("Rabbitmq_Queues")
-				populateQueues(queues)
-			}
-			panicOnErr(i.Publish())
-		}
+		populateQueues(i)
 	}
+	panicOnErr(i.Publish())
 }
 
 func rmqClient() *rabbithole.Client {
@@ -96,22 +81,22 @@ func populateOverview(ms *metric.Set) {
 	//Cluster Running Count (GET ME INTO A FUNCTION!)
 	var runCount = 0
 	var nodeCount = len(xs)
-	var i = 0
-	for i <= nodeCount-1 {
-		var nodeIsRunning = xs[i].IsRunning
+	var n = 0
+	for n <= nodeCount-1 {
+		var nodeIsRunning = xs[n].IsRunning
 
 		if nodeIsRunning {
 			runCount = runCount + 1
-			fduVar := fmt.Sprintf("Node %v File Descriptors Used", i)
-			fdtVar := fmt.Sprintf("Node %v File Descriptors Total", i)
-			procuVar := fmt.Sprintf("Node %v Erlang Processes Used", i)
-			proctVar := fmt.Sprintf("Node %v Erlang Processes Total", i)
-			ms.SetMetric(fduVar, xs[i].FdUsed, metric.GAUGE)
-			ms.SetMetric(fdtVar, xs[i].FdTotal, metric.GAUGE)
-			ms.SetMetric(procuVar, xs[i].ProcUsed, metric.GAUGE)
-			ms.SetMetric(proctVar, xs[i].ProcTotal, metric.GAUGE)
+			fduVar := fmt.Sprintf("Node %v File Descriptors Used", n)
+			fdtVar := fmt.Sprintf("Node %v File Descriptors Total", n)
+			procuVar := fmt.Sprintf("Node %v Erlang Processes Used", n)
+			proctVar := fmt.Sprintf("Node %v Erlang Processes Total", n)
+			ms.SetMetric(fduVar, xs[n].FdUsed, metric.GAUGE)
+			ms.SetMetric(fdtVar, xs[n].FdTotal, metric.GAUGE)
+			ms.SetMetric(procuVar, xs[n].ProcUsed, metric.GAUGE)
+			ms.SetMetric(proctVar, xs[n].ProcTotal, metric.GAUGE)
 		}
-		i = i + 1
+		n = n + 1
 	}
 
 	// Object Totals
@@ -132,12 +117,16 @@ func populateOverview(ms *metric.Set) {
 
 }
 
-func worker(rmqc *rabbithole.Client, queues *metric.Set, workerId int, jobs <-chan int, results chan<- int) {
+func worker(rmqc *rabbithole.Client, i *integration.Integration, workerId int, jobs <-chan int, results chan<- int) {
 	for j := range jobs {
 		values := url.Values{"page": {strconv.Itoa(j)}}
 		rs, err := rmqc.PagedListQueuesWithParameters(values)
 		panicOnErr(err)
 		for _, queue := range rs.Items {
+			vhostQueue := queue.Vhost + "/" + queue.Name
+			entityQueues, err := i.Entity(vhostQueue, "rabbitmq_queue")
+			panicOnErr(err)
+			queues := entityQueues.NewMetricSet("Rabbitmq_Queues")
 			queues.SetMetric("messages", queue.Messages, metric.GAUGE)
 			queues.SetMetric("consumers", queue.Consumers, metric.GAUGE)
 			queues.SetMetric("message_rate", queue.MessagesDetails.Rate, metric.GAUGE)
@@ -148,7 +137,7 @@ func worker(rmqc *rabbithole.Client, queues *metric.Set, workerId int, jobs <-ch
 	}
 }
 
-func populateQueues(queues *metric.Set) {
+func populateQueues(i *integration.Integration) {
 	rmqc := rmqClient()
 	values := url.Values{"page": {"1"}}
 	// values := url.Values{}
@@ -170,7 +159,7 @@ func populateQueues(queues *metric.Set) {
 
 	jobs := make(chan int, workerCount)
 	for w := 1; w <= workerCount; w++ {
-		go worker(rmqc, queues, w, jobs, results)
+		go worker(rmqc, i, w, jobs, results)
 
 	}
 	for currentPage := 1; currentPage <= qs.PageCount; currentPage++ {
