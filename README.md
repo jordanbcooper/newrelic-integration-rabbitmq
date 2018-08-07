@@ -71,49 +71,67 @@ Object Totals (Average):
 ```
 {
   "name": "com.org.rabbitmq",
-  "protocol_version": "1",
+  "protocol_version": "2",
   "integration_version": "0.1.0",
-  "metrics": [
+  "data": [
     {
-      "Channels": 243,
-      "Connections": 87,
-      "Consumers": 131,
-      "Deliver": 2,
-      "Exchanges": 359,
-      "Messages": 0,
-      "Messages Ready": 0,
-      "Messages Unacknowledged": 0,
-      "Node 0 Erlang Processes Total": 1048576,
-      "Node 0 Erlang Processes Used": 1270,
-      "Node 0 File Descriptors Total": 300000,
-      "Node 0 File Descriptors Used": 182,
-      "Node 1 Erlang Processes Total": 1048576,
-      "Node 1 Erlang Processes Used": 1604,
-      "Node 1 File Descriptors Total": 300000,
-      "Node 1 File Descriptors Used": 206,
-      "Node 2 Erlang Processes Total": 1048576,
-      "Node 2 Erlang Processes Used": 1036,
-      "Node 2 File Descriptors Total": 300000,
-      "Node 2 File Descriptors Used": 169,
-      "Node 3 Erlang Processes Total": 1048576,
-      "Node 3 Erlang Processes Used": 1507,
-      "Node 3 File Descriptors Total": 300000,
-      "Node 3 File Descriptors Used": 196,
-      "Node 4 Erlang Processes Total": 1048576,
-      "Node 4 Erlang Processes Used": 1322,
-      "Node 4 File Descriptors Total": 300000,
-      "Node 4 File Descriptors Used": 185,
-      "Publish": 4.2,
-      "Queues": 148,
-      "Running": 5,
-      "event_type": "RabbitMQ_Sample"
+      "entity": {
+        "name": "rabbit@localhost",
+        "type": "rabbitmq_overview"
+      },
+      "metrics": [
+        {
+          "Channels": 480,
+          "Connections": 117,
+          "Consumers": 286,
+          "Deliver": 17.4,
+          "Exchanges": 44,
+          "Messages": 0,
+          "Messages Ready": 0,
+          "Messages Unacknowledged": 0,
+          "Node 0 Erlang Processes Total": 1048576,
+          "Node 0 Erlang Processes Used": 441,
+          "Node 0 File Descriptors Total": 300000,
+          "Node 0 File Descriptors Used": 63,
+          "Node 1 Erlang Processes Total": 1048576,
+          "Node 1 Erlang Processes Used": 1606,
+          "Node 1 File Descriptors Total": 300000,
+          "Node 1 File Descriptors Used": 95,
+          "Node 2 Erlang Processes Total": 1048576,
+          "Node 2 Erlang Processes Used": 3987,
+          "Node 2 File Descriptors Total": 300000,
+          "Node 2 File Descriptors Used": 190,
+          "Publish": 19,
+          "Queues": 302,
+          "Running": 3,
+          "event_type": "RabbitMQ_Overview"
+        }
+      ],
+      "inventory": {
+        "Software Version": {
+          "value": "3.6.15"
+        }
+      },
+      "events": []
+    },
+    {
+      "entity": {
+        "name": "vhost/queue",
+        "type": "queue"
+      },
+      "metrics": [
+        {
+          "consumers": 1,
+          "event_type": "Rabbitmq_Queues",
+          "message_rate": 0,
+          "messages": 0,
+          "messages_ready": 0,
+          "messages_unacknowledged": 0
+        }
+      ],
+      "inventory": {},
+      "events": []
     }
-  ],
-  "inventory": {
-    "Software Version": {
-      "value": "3.7.4"
-    }
-  },
-  "events": []
-}
+   ]
+ }
 ```
