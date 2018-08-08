@@ -25,8 +25,8 @@ type Config struct {
 }
 
 const (
-	integrationName    = "com.zipcar.rabbitmq"
-	integrationVersion = "0.1.0"
+	integrationName    = "com.org.rabbitmq"
+	integrationVersion = "1.0.0"
 )
 
 var args argumentList
