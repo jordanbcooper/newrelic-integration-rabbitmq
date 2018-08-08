@@ -21,23 +21,24 @@ type Config struct {
 	User     string `env:"RMQ_USERNAME"`
 	Password string `env:"RMQ_PASSWORD"`
 	Host     string `env:"RMQ_HOSTNAME"`
+	Cluster  string `env:"RMQ_CLUSTER"`
 }
 
 const (
-	integrationName    = "com.org.rabbitmq"
+	integrationName    = "com.zipcar.rabbitmq"
 	integrationVersion = "0.1.0"
 )
 
 var args argumentList
 
+var cfg = Config{}
+
 func main() {
 
 	i, err := integration.New(integrationName, integrationVersion, integration.Args(&args))
 	panicOnErr(err)
-	rmqc := rmqClient()
-	cn, err := rmqc.GetClusterName()
-	panicOnErr(err)
-	entityOverview, err := i.Entity(cn.Name, "rabbitmq_overview")
+	env.Parse(&cfg)
+	entityOverview, err := i.Entity(cfg.Cluster, "cluster_overview")
 	panicOnErr(err)
 
 	if args.All() || args.Inventory {
@@ -57,7 +58,6 @@ func main() {
 }
 
 func rmqClient() *rabbithole.Client {
-	cfg := Config{}
 	env.Parse(&cfg)
 	rmqc, err := rabbithole.NewClient(cfg.Host, cfg.User, cfg.Password)
 	panicOnErr(err)
@@ -124,7 +124,7 @@ func worker(rmqc *rabbithole.Client, i *integration.Integration, workerId int, j
 		panicOnErr(err)
 		for _, queue := range rs.Items {
 			vhostQueue := queue.Vhost + "/" + queue.Name
-			entityQueues, err := i.Entity(vhostQueue, "rabbitmq_queue")
+			entityQueues, err := i.Entity(vhostQueue, "queue")
 			panicOnErr(err)
 			queues := entityQueues.NewMetricSet("Rabbitmq_Queues")
 			queues.SetMetric("messages", queue.Messages, metric.GAUGE)
@@ -145,12 +145,16 @@ func populateQueues(i *integration.Integration) {
 	panicOnErr(err)
 	results := make(chan int, qs.PageCount)
 	if qs.PageCount == 0 {
-		fmt.Println("no queues")
+		env.Parse(&cfg)
+		noQueues := cfg.Cluster + "/no_queues"
+		entityQueues, err := i.Entity(noQueues, "queue")
+		panicOnErr(err)
+		queues := entityQueues.NewMetricSet("Rabbitmq_Queues")
+		queues.SetMetric("queues", 0, metric.GAUGE)
 		return
 	}
 	// TODO allow QueueFetchWorkerCount to be configurable in boshrelease
 	// Should default to 1 in the boshrelease
-	cfg := Config{}
 	env.Parse(&cfg)
 	workerCount := cfg.Workers
 	if workerCount > qs.PageCount {
