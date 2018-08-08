@@ -63,7 +63,7 @@ Running `make status` will show you any running dev containers.
 ## New Relic Insights Dashboard NRQL query
 Object Totals (Average):
 <br>
-```SELECT average(Exchanges), average(Consumers), average(Channels), average(Connections) from OrgRabbitMQ_IntegrationSample since 30 minutes ago TIMESERIES AUTO```
+```SELECT average(Exchanges), average(Consumers), average(Channels), average(Connections) from RabbitMQ_Overview since 30 minutes ago TIMESERIES AUTO```
 
 <br>
 
