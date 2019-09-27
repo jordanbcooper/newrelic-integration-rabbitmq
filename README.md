@@ -1,3 +1,5 @@
+NO LONGER MAINTAINED, USE THIS OFFICIAL INTEGRATION: https://github.com/newrelic/nri-rabbitmq
+
 # newrelic-integration-rabbitmq
 Integration for New Relic Infrastructure written in Go
 
